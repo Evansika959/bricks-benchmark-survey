@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Survey of 39 public hardware-design benchmarks rated on the five BRICKS bricks: specification, RTL, golden model, testbench, PPA.">
+<title>BRICKS Benchmark Survey</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one reading column for prose, full-width survey matrix, three-column findings band. */
+:root{
+  --bg:#f2f4f5; --surface:#ffffff; --ink:#18212a; --muted:#57636e; --line:#d5dce2; --head:#e6ecf0;
+  --accent:#1c5f7c; --ours:#b2471f; --ours-bg:#fbeee6;
+  --yes:#1a7a4c; --part:#a87a0a; --no:#9aa5ae; --track:#e3e8ec;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10161a; --surface:#172027; --ink:#e0e7ec; --muted:#96a4b0; --line:#2a353e; --head:#1d2830;
+  --accent:#6bb3cf; --ours:#e8875a; --ours-bg:#2b1d16;
+  --yes:#2f9e6a; --part:#b38218; --no:#5d6a74; --track:#26313a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10161a; --surface:#172027; --ink:#e0e7ec; --muted:#96a4b0; --line:#2a353e; --head:#1d2830;
+  --accent:#6bb3cf; --ours:#e8875a; --ours-bg:#2b1d16;
+  --yes:#2f9e6a; --part:#b38218; --no:#5d6a74; --track:#26313a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--body);margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 56px}
+a{color:var(--accent);text-underline-offset:2px}
+a:focus-visible,button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eyebrow{font:500 12px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+h1{font:700 clamp(30px,5vw,46px)/1.08 var(--display);margin:0 0 18px;text-wrap:balance;letter-spacing:-.01em}
+h2{font:600 26px/1.2 var(--display);margin:0 0 16px;text-wrap:balance}
+.lede{max-width:68ch;color:var(--muted);display:grid;gap:10px}
+.lede p{margin:0}.lede b{color:var(--ink);font-weight:600}
+section{margin-top:48px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:16px;color:var(--muted);font-size:14px}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block;flex:none;vertical-align:middle}
+.dot.y{background:var(--yes)}
+.dot.p{background:linear-gradient(90deg,var(--part) 50%,transparent 50%);box-shadow:inset 0 0 0 2px var(--part)}
+.dot.n{box-shadow:inset 0 0 0 1.5px var(--no)}
+.bricks{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.brick{font:500 12px/1 var(--mono);padding:6px 9px;border:1px solid var(--line);background:var(--surface);border-radius:2px}
+/* coverage cards */
+.cover{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:26px 40px}
+.cv{display:grid;gap:8px;align-content:start;min-width:0}
+.cv-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.cv-name{font-weight:600}
+.cv-count{font:12px/1.3 var(--mono);color:var(--muted);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar{display:flex;height:10px;background:var(--track);border-radius:2px;overflow:hidden;gap:2px}
+.bar i{display:block;height:100%}
+.bar .y{background:var(--yes)}.bar .p{background:var(--part)}
+.cv-ours{font-size:13px;color:var(--muted)}.cv-ours b{color:var(--ours);font-weight:600}
+.note{font-size:13px;color:var(--muted);max-width:80ch;margin-top:14px}
+/* controls */
+.controls{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin-bottom:12px}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--surface);max-width:100%}
+.seg button{font:500 14px var(--body);color:var(--ink);background:none;border:0;padding:7px 12px;cursor:pointer;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.search{font:14px var(--body);padding:8px 11px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink);width:min(280px,100%)}
+.count{font:12px var(--mono);color:var(--muted);margin:0 0 10px}
+/* table */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:4px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:860px;font-size:14px}
+thead th{background:var(--head);text-align:left;font-weight:600;padding:11px 10px;vertical-align:bottom;border-bottom:1px solid var(--line);white-space:nowrap}
+thead th.c{text-align:center}
+thead th small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+td{padding:12px 10px;vertical-align:top;border-top:1px solid var(--line)}
+td.c{text-align:center}
+td.name{width:300px;border-right:1px solid var(--line)}
+tr.cat td{background:var(--head);font:600 13px var(--body);padding:8px 10px;color:var(--ink)}
+.mem+.mem{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.mname{font-weight:600}
+.mmeta{font:12px/1.4 var(--mono);color:var(--accent)}
+.links{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:3px;font-size:13px}
+.links .unv{color:var(--muted);font-size:12px}
+.size{font:500 13px var(--mono);white-space:nowrap}
+.notes{color:var(--muted);font-size:13px;max-width:52ch}
+.full-only{display:none}
+.full .full-only{display:table-cell}
+tr.ours td{background:var(--ours-bg)}
+tr.ours td.name{box-shadow:inset 3px 0 0 var(--ours)}
+tr.ours .mname,tr.ours .mmeta{color:var(--ours)}
+.tip{position:relative;display:inline-block;padding:4px;cursor:help}
+.tip .tt{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);width:220px;background:var(--ink);color:var(--bg);font:12px/1.4 var(--body);padding:7px 9px;border-radius:4px;text-align:left;visibility:hidden;opacity:0;transition:opacity .12s;z-index:3;pointer-events:none}
+.tip:hover .tt,.tip:focus .tt{visibility:visible;opacity:1}
+.subhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin:30px 0 10px}
+.subhead h3{font:600 19px var(--display);margin:0}
+/* findings */
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:36px}
+.col{border-top:2px solid var(--ink);padding-top:16px;min-width:0}
+.col.ours{border-top-color:var(--ours)}
+.col ul{margin:0;padding-left:18px;display:grid;gap:12px}
+.col li::marker{color:var(--accent)}
+.col.ours li::marker{color:var(--ours)}
+.col b{font-weight:600}
+.aim{font:500 12px var(--mono);color:var(--ours);letter-spacing:.04em}
+dl.read{display:grid;grid-template-columns:minmax(140px,190px) 1fr;gap:8px 24px;margin:0}
+dl.read dt{font-weight:600}dl.read dd{margin:0;color:var(--muted)}
+@media (max-width:640px){dl.read{grid-template-columns:1fr;gap:2px}dl.read dd{margin-bottom:10px}}
+footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;font-size:13px;color:var(--muted);max-width:90ch}
+@media (prefers-reduced-motion:reduce){.tip .tt{transition:none}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">Literature survey · BRICKS · public hardware-design benchmarks</p>
+  <h1>Which public hardware-design benchmarks have every brick?</h1>
+  <div class="lede">
+    <p>AI-driven hardware design needs training and evaluation items that are <b>aligned tuples</b>, not isolated files. A complete entry has a natural-language specification, a synthesizable RTL implementation (and, where relevant, the HLS source it came from), a gate-level or golden reference model, a verified testbench, and physical-implementation annotations (power, performance, area).</p>
+    <p>We surveyed <b>39 publicly released benchmarks and datasets</b>: logic-synthesis and test suites, LLM-for-RTL benchmarks and corpora, verification benchmarks, HLS suites, PPA and physical-design datasets, and analog/mixed-signal datasets. Each row records which bricks a resource ships and how large it is. Ratings reflect what the released artifacts or the accompanying paper advertise. The proposed BRICKS target is the last row, highlighted.</p>
+  </div>
+  <div class="bricks" aria-label="The five bricks">
+    <span class="brick">NL specification</span><span class="brick">RTL (+ HLS source)</span><span class="brick">Golden / gate-level model</span><span class="brick">Verified testbench</span><span class="brick">PPA annotations</span>
+  </div>
+  <div class="legend" aria-label="Legend">
+    <span><i class="dot y"></i>Shipped and usable</span>
+    <span><i class="dot p"></i>Partial, indirect, machine-generated or lower-fidelity</span>
+    <span><i class="dot n"></i>Not shipped</span>
+  </div>
+</header>
+
+<section aria-labelledby="cov-h">
+  <h2 id="cov-h">What the 35 digital and HLS resources cover</h2>
+  <div class="cover" id="cover"></div>
+  <p class="note">Counted per resource, so grouped rows in the table count once per member. The four analog and mixed-signal datasets use different columns and are listed in their own table.</p>
+</section>
+
+<section aria-labelledby="tbl-h">
+  <h2 id="tbl-h">The survey</h2>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Detail level">
+      <button id="v-quick" aria-pressed="true">Quick view</button><button id="v-full" aria-pressed="false">Full details</button>
+    </div>
+    <div class="seg" role="group" aria-label="Category" id="cats"></div>
+    <input class="search" id="q" type="search" placeholder="Search name, origin, notes…" aria-label="Search the survey">
+  </div>
+  <p class="count" id="count"></p>
+
+  <div id="dig-block">
+    <div class="tbl-wrap"><table id="dig">
+      <thead><tr>
+        <th>Benchmark<small>year · origin · links</small></th><th>Size</th>
+        <th class="c">Spec</th><th class="c">HLS</th><th class="c">RTL</th><th class="c">Gate</th><th class="c">TB</th><th class="c">PPA</th>
+        <th class="full-only">Notes</th>
+      </tr></thead><tbody></tbody>
+    </table></div>
+  </div>
+
+  <div id="ana-block">
+    <div class="subhead"><h3>Analog and mixed-signal datasets</h3><span class="count" style="margin:0">different bricks apply: SPICE, schematic, layout, simulation testbench, figures of merit</span></div>
+    <div class="tbl-wrap"><table id="ana">
+      <thead><tr>
+        <th>Dataset<small>year · origin · links</small></th><th>Size</th>
+        <th class="c">Spec</th><th class="c">SPICE</th><th class="c">Schem.</th><th class="c">Layout</th><th class="c">Sim TB</th><th class="c">FoM</th>
+        <th class="full-only">Notes</th>
+      </tr></thead><tbody></tbody>
+    </table></div>
+  </div>
+  <p class="note">In the quick view, hover over or focus a dot to see what it means, or switch to full details for the notes on each row. Links marked † were not re-checked during this survey.</p>
+</section>
+
+<section aria-labelledby="find-h">
+  <h2 id="find-h" class="sr" style="position:absolute;left:-9999px">Findings</h2>
+  <div class="cols">
+    <div class="col"><h2>What earlier work covers</h2><ul id="earlier"></ul></div>
+    <div class="col"><h2>The gaps</h2><ul id="gaps"></ul></div>
+    <div class="col ours"><h2>What BRICKS adds</h2><ul id="adds"></ul></div>
+  </div>
+</section>
+
+<section aria-labelledby="read-h">
+  <h2 id="read-h">How to read the table</h2>
+  <dl class="read">
+    <dt>Spec</dt><dd>Natural-language specification. Shipped means human- or expert-authored. Partial means LLM-generated or incidental documentation.</dd>
+    <dt>HLS</dt><dd>HLS (C/C++) description.</dd>
+    <dt>RTL</dt><dd>RTL in Verilog, VHDL or SystemVerilog.</dd>
+    <dt>Gate</dt><dd>Gate-level netlist.</dd>
+    <dt>TB</dt><dd>Testbench. Partial means a self-checking harness, assertions or a formal checker rather than a full reference testbench.</dd>
+    <dt>PPA</dt><dd>Power, performance and area annotations. Shipped means post-place-and-route or post-layout. Partial means post-synthesis or post-HLS estimates only.</dd>
+    <dt>Size</dt><dd><b>+</b> up to roughly 200 items, or mostly small blocks. <b>++</b> hundreds to tens of thousands of items, or designs up to roughly 100K gates. <b>+++</b> more than 100K items, or million-gate designs. Grouped rows share identical ratings on all six bricks, so the size column shows the range.</dd>
+  </dl>
+</section>
+
+<footer>
+  <p id="caveat"></p>
+</footer>
+</div>
+
+<script id="data" type="application/json">{"digital": [{"table": "digital", "cat": "A. Legacy logic-synthesis, test, and EDA suites", "members": [{"name": "ISCAS'85 + Hayes high-level models", "meta": "1985; 1999 HLMs", "refs": [1]}], "r": {"spec": "p", "hls": "n", "rtl": "p", "gate": "y", "tb": "n", "ppa": "n"}, "size": "+", "notes": "10 combinational circuits, up to ~3.5K gates; RTL/behavioral Verilog exists only because it was manually reverse-engineered [40]."}, {"table": "digital", "cat": "A. Legacy logic-synthesis, test, and EDA suites", "members": [{"name": "ISCAS'89", "meta": "1989", "refs": [2]}, {"name": "IWLS 2005", "meta": "Cadence Berkeley Labs", "refs": [5]}], "r": {"spec": "n", "hls": "n", "rtl": "p", "gate": "y", "tb": "n", "ppa": "n"}, "size": "+/++", "notes": "ISCAS'89: sequential netlists up to roughly 20K gates; high-level models for only several of the smaller circuits. IWLS 2005: 84 designs (OpenCores 26, ITC'99 21, ISCAS 30, others) mapped to a 180 nm library; up to ~900K cells."}, {"table": "digital", "cat": "A. Legacy logic-synthesis, test, and EDA suites", "members": [{"name": "ITC'99 / I99T", "meta": "1999; Politecnico di Torino", "refs": [3]}], "r": {"spec": "p", "hls": "n", "rtl": "y", "gate": "y", "tb": "n", "ppa": "n"}, "size": "++", "notes": "~22 designs (VHDL RTL plus EDIF/bench/BLIF netlists); largest ≈70K gates, 3,320 flip-flops."}, {"table": "digital", "cat": "A. Legacy logic-synthesis, test, and EDA suites", "members": [{"name": "LGSynth'89/'91, IWLS'93, MCNC", "meta": "", "refs": [4]}], "r": {"spec": "n", "hls": "n", "rtl": "n", "gate": "y", "tb": "n", "ppa": "n"}, "size": "+", "notes": "Small-to-medium BLIF/PLA logic networks and FSMs."}, {"table": "digital", "cat": "A. Legacy logic-synthesis, test, and EDA suites", "members": [{"name": "EPFL Combinational Suite", "meta": "2015", "refs": [6]}], "r": {"spec": "n", "hls": "n", "rtl": "p", "gate": "y", "tb": "n", "ppa": "p"}, "size": "+++", "notes": "23 circuits (10 arithmetic, 10 random/control, 3 with >10M gates); Verilog/VHDL/BLIF/AIGER; best LUT-6 size/depth results tracked."}, {"table": "digital", "cat": "B. LLM-era RTL-generation and verification benchmarks (evaluation)", "members": [{"name": "VerilogEval v1/v2", "meta": "2023/2024; NVIDIA", "refs": [8]}, {"name": "RTLLM 2.0", "meta": "2023/2025; HKUST", "refs": [9]}, {"name": "CVDP", "meta": "2025; NVIDIA; v1.1.0 2026; Si2 LBC-bench", "refs": [11]}, {"name": "ChipBench", "meta": "2026; UCSD/Columbia", "refs": [12]}, {"name": "RealBench", "meta": "2025; ICT-CAS", "refs": [13]}], "r": {"spec": "y", "hls": "n", "rtl": "y", "gate": "n", "tb": "y", "ppa": "n"}, "size": "+/++", "notes": "VerilogEval: 156 HDLBits-derived problems with iverilog testbenches. RTLLM 2.0: 50 hand-crafted designs. CVDP: 783 expert-authored problems in 13 categories (783 retained from 1,313 written), cocotb harnesses. ChipBench: 44 generation, 89 debugging, and 132 reference-model cases (Python/SystemC/CXXRTL), avg ≈62 LOC. RealBench: real-world IP designs with module- and system-level tasks, full line-coverage testbenches plus a formal equivalence checker."}, {"table": "digital", "cat": "B. LLM-era RTL-generation and verification benchmarks (evaluation)", "members": [{"name": "FVEval", "meta": "2024; NVIDIA/Berkeley", "refs": [20]}, {"name": "AssertEval", "meta": "in OpenLLM-RTL, 2025", "refs": [21]}], "r": {"spec": "y", "hls": "n", "rtl": "y", "gate": "n", "tb": "p", "ppa": "n"}, "size": "+/++", "notes": "FVEval: three sub-benchmarks (NL2SVA-Human, NL2SVA-Machine, Design2SVA) with SVA assertions and formal checks as the oracle. AssertEval: 18 designs with specification, signal definitions, and correct RTL."}, {"table": "digital", "cat": "C. RTL corpora and training datasets", "members": [{"name": "OpenCores", "meta": "community repository", "refs": [7]}, {"name": "RTLCoder-Data / Resyn-27k", "meta": "2023/2025; HKUST", "refs": [17]}], "r": {"spec": "p", "hls": "n", "rtl": "y", "gate": "n", "tb": "p", "ppa": "n"}, "size": "++", "notes": "OpenCores: large, heterogeneous IP collection; documentation and testbench quality vary per core. RTLCoder-Data: 27K → 80K GPT-generated instruction–code pairs; 7K subset checked with LLM-generated assertions; research use."}, {"table": "digital", "cat": "C. RTL corpora and training datasets", "members": [{"name": "RTL-Repo", "meta": "2024; AUC", "refs": [10]}, {"name": "VeriGen / Verilog_GitHub", "meta": "2023; NYU", "refs": [14]}], "r": {"spec": "n", "hls": "n", "rtl": "y", "gate": "n", "tb": "n", "ppa": "n"}, "size": "++/+++", "notes": "RTL-Repo: 4,098 code-completion samples from 1,361 GitHub repositories with multi-file context. VeriGen: >100K rows (1.9 GB) of GitHub and textbook Verilog; code only."}, {"table": "digital", "cat": "C. RTL corpora and training datasets", "members": [{"name": "PyraNet", "meta": "2024; UNLV", "refs": [15]}, {"name": "MG-Verilog", "meta": "2024; Georgia Tech", "refs": [16]}, {"name": "VerilogDB", "meta": "2025; UF", "refs": [19]}], "r": {"spec": "p", "hls": "n", "rtl": "y", "gate": "n", "tb": "n", "ppa": "n"}, "size": "++/+++", "notes": "PyraNet: ≈692K entries with LLM-generated descriptions, complexity and compile labels (CC BY-NC-SA 4.0). MG-Verilog: 11K+ modules with multi-granularity LLM descriptions. VerilogDB: 20,392 synthesizable modules (751 MB), Yosys-checked, short NL descriptions in metadata."}, {"table": "digital", "cat": "C. RTL corpora and training datasets", "members": [{"name": "OpenRTLSet", "meta": "2026; UIUC", "refs": [18]}], "r": {"spec": "p", "hls": "p", "rtl": "y", "gate": "n", "tb": "n", "ppa": "n"}, "size": "+++", "notes": "131K+ modules: 102K GitHub, 5K VHDL→Verilog, 24K C/C++→Verilog via HLS; Verilator-pass flag only."}, {"table": "digital", "cat": "D. HLS suites and datasets", "members": [{"name": "CHStone", "meta": "2008", "refs": [22]}], "r": {"spec": "n", "hls": "y", "rtl": "n", "gate": "n", "tb": "p", "ppa": "p"}, "size": "+", "notes": "12 self-contained C programs with built-in checking; baseline synthesis results in the paper."}, {"table": "digital", "cat": "D. HLS suites and datasets", "members": [{"name": "MachSuite", "meta": "2014", "refs": [23]}, {"name": "PolyBench/C", "meta": "Pouchet", "refs": [24]}], "r": {"spec": "n", "hls": "y", "rtl": "n", "gate": "n", "tb": "p", "ppa": "n"}, "size": "+", "notes": "MachSuite: 19 benchmarks / 12 kernels with input and check data. PolyBench/C: ≈26–30 loop kernels (count varies by version and use)."}, {"table": "digital", "cat": "D. HLS suites and datasets", "members": [{"name": "Rosetta", "meta": "2018; Cornell", "refs": [25]}], "r": {"spec": "p", "hls": "y", "rtl": "n", "gate": "n", "tb": "p", "ppa": "p"}, "size": "+", "notes": "A handful of full FPGA applications (≈5–9 depending on version); paper reports optimized results."}, {"table": "digital", "cat": "D. HLS suites and datasets", "members": [{"name": "HLS-Eval", "meta": "2025; Georgia Tech", "refs": [26]}], "r": {"spec": "y", "hls": "y", "rtl": "n", "gate": "n", "tb": "y", "ppa": "p"}, "size": "+", "notes": "94 \"LLM-ready\" designs from 8 sources (PolyBench, MachSuite, CHStone, Rosetta, others); average kernel 17–70 LOC; Vitis HLS flow."}, {"table": "digital", "cat": "D. HLS suites and datasets", "members": [{"name": "HLSFactory", "meta": "2024; Georgia Tech", "refs": [27]}], "r": {"spec": "n", "hls": "y", "rtl": "p", "gate": "n", "tb": "p", "ppa": "p"}, "size": "++", "notes": "Framework plus datasets built from PolyBench, MachSuite, Rosetta, CHStone, textbook and vendor examples; post-HLS QoR across vendor flows."}, {"table": "digital", "cat": "D. HLS suites and datasets", "members": [{"name": "ForgeHLS", "meta": "2025; HKUST/CUHK", "refs": [28]}], "r": {"spec": "n", "hls": "y", "rtl": "p", "gate": "n", "tb": "n", "ppa": "p"}, "size": "+++", "notes": "≈430K–460K designs from 536–846 C++ kernels (version-dependent) with auto-inserted pragmas and post-HLS latency/resource labels."}, {"table": "digital", "cat": "E. PPA, synthesis, and physical-design datasets", "members": [{"name": "OpenABC-D", "meta": "2021; NYU", "refs": [29]}], "r": {"spec": "n", "hls": "n", "rtl": "y", "gate": "y", "tb": "n", "ppa": "p"}, "size": "+++", "notes": "29 open-source IPs × 1,500 synthesis recipes = 870K AIGs; labels for node count, depth, area, and delay (no power)."}, {"table": "digital", "cat": "E. PPA, synthesis, and physical-design datasets", "members": [{"name": "ForgeEDA", "meta": "2025; CUHK et al.", "refs": [30]}], "r": {"spec": "n", "hls": "n", "rtl": "y", "gate": "y", "tb": "n", "ppa": "y"}, "size": "++", "notes": "1,189 RTL repositories in 7 categories; 4,450 post-mapping netlists with synthesis reports, AIGs, and placed netlists with physical-design reports (SKY130)."}, {"table": "digital", "cat": "E. PPA, synthesis, and physical-design datasets", "members": [{"name": "DeepCircuitX", "meta": "2025; HKUST", "refs": [31]}], "r": {"spec": "p", "hls": "n", "rtl": "y", "gate": "y", "tb": "n", "ppa": "p"}, "size": "++", "notes": "4,000+ repository-level RTL projects with multi-level chain-of-thought descriptions, synthesized netlists, and PPA metrics."}, {"table": "digital", "cat": "E. PPA, synthesis, and physical-design datasets", "members": [{"name": "MetRex", "meta": "2024; Brown", "refs": [32]}], "r": {"spec": "n", "hls": "n", "rtl": "y", "gate": "p", "tb": "n", "ppa": "p"}, "size": "++", "notes": "25,868 Verilog designs with post-synthesis area, delay, and static power (Yosys + OpenSTA)."}, {"table": "digital", "cat": "E. PPA, synthesis, and physical-design datasets", "members": [{"name": "RTL-OPT", "meta": "2026; HKUST", "refs": [33]}], "r": {"spec": "n", "hls": "n", "rtl": "y", "gate": "n", "tb": "p", "ppa": "p"}, "size": "+", "notes": "36 hand-crafted suboptimal/optimized RTL pairs with Synopsys DC PPA and an evaluation framework."}, {"table": "digital", "cat": "E. PPA, synthesis, and physical-design datasets", "members": [{"name": "CircuitNet 1.0/2.0/3.0", "meta": "2022–; Peking U.", "refs": [34]}], "r": {"spec": "n", "hls": "n", "rtl": "p", "gate": "p", "tb": "n", "ppa": "y"}, "size": "+++", "notes": "10K+ samples; CPU/GPU/AI-chip designs through commercial flows (14 nm FinFET in v2.0); congestion, DRC, IR-drop, timing, power; up to million-gate designs."}, {"table": "digital", "cat": "E. PPA, synthesis, and physical-design datasets", "members": [{"name": "OpenROAD-flow-scripts reference designs", "meta": "", "refs": [35]}], "r": {"spec": "n", "hls": "n", "rtl": "y", "gate": "p", "tb": "p", "ppa": "y"}, "size": "+", "notes": "Dozens of open designs (e.g., RISC-V cores, AES, JPEG) across multiple open PDKs, with flow metrics."}], "analog": [{"table": "analog", "cat": "F. Analog / mixed-signal datasets", "members": [{"name": "AnalogCoder", "meta": "2024; HKU/UT Austin", "refs": [36]}], "r": {"spec": "y", "spice": "y", "schem": "n", "layout": "n", "simtb": "y", "fom": "p"}, "size": "+", "notes": "24 design tasks; circuits expressed as Python that emits SPICE; pass/fail functional checks"}, {"table": "analog", "cat": "F. Analog / mixed-signal datasets", "members": [{"name": "AnalogGenie", "meta": "2025; Washington Univ. in St. Louis", "refs": [37]}], "r": {"spec": "n", "spice": "y", "schem": "y", "layout": "n", "simtb": "n", "fom": "n"}, "size": "++", "notes": "3,350 topologies in 11 circuit types (op-amps, LDOs, PLLs, mixers, and others); largest circuit 54 devices"}, {"table": "analog", "cat": "F. Analog / mixed-signal datasets", "members": [{"name": "Masala-CHAI", "meta": "2024; NYU", "refs": [38]}], "r": {"spec": "p", "spice": "y", "schem": "y", "layout": "n", "simtb": "n", "fom": "n"}, "size": "++", "notes": "≈7,500 SPICE netlists extracted from textbook schematics, with captions and component metadata"}, {"table": "analog", "cat": "F. Analog / mixed-signal datasets", "members": [{"name": "AMSbench", "meta": "2025; Fudan/UCLA", "refs": [39]}], "r": {"spec": "y", "spice": "p", "schem": "y", "layout": "n", "simtb": "n", "fom": "p"}, "size": "++", "notes": "Multimodal Q&A benchmark (perception, analysis, design); thousands of items; no simulation-verified designs"}], "refs": {"1": {"label": "ISCAS'85 (mirror and description)", "links": [{"k": "Site", "u": "https://ddd.fit.cvut.cz/www/prj/Benchmarks/"}, {"k": "Site", "u": "https://ddd.fit.cvut.cz/www/prj/Benchmarks/ISCAS_Desc/ISCAS_HLM.html"}], "unverified": false}, "2": {"label": "ISCAS'89", "links": [{"k": "Site", "u": "https://ddd.fit.cvut.cz/www/prj/Benchmarks/"}], "unverified": false}, "3": {"label": "ITC'99 / I99T", "links": [{"k": "Code", "u": "https://github.com/cad-polito-it/i99t"}, {"k": "Site", "u": "https://www.cerc.utexas.edu/itc99-benchmarks/"}], "unverified": false}, "4": {"label": "LGSynth'89/'91, IWLS'93, MCNC", "links": [{"k": "Site", "u": "https://ddd.fit.cvut.cz/www/prj/Benchmarks/"}], "unverified": false}, "5": {"label": "IWLS 2005", "links": [{"k": "Site", "u": "https://ddd.fit.cvut.cz/www/prj/Benchmarks/IWLS2005.pdf"}], "unverified": false}, "6": {"label": "EPFL Combinational Benchmark Suite", "links": [{"k": "Site", "u": "https://epfl.ch/labs/lsi/page-102566-en-html/benchmarks"}, {"k": "Paper", "u": "https://infoscience.epfl.ch/record/207551"}], "unverified": false}, "7": {"label": "OpenCores", "links": [{"k": "Site", "u": "https://opencores.org"}], "unverified": true}, "8": {"label": "VerilogEval", "links": [{"k": "Code", "u": "https://github.com/NVlabs/verilog-eval"}, {"k": "Paper", "u": "https://arxiv.org/abs/2408.11053"}], "unverified": false}, "9": {"label": "RTLLM / OpenLLM-RTL", "links": [{"k": "Code", "u": "https://github.com/hkust-zhiyao/RTLLM"}, {"k": "Paper", "u": "https://arxiv.org/abs/2503.15112"}], "unverified": false}, "10": {"label": "RTL-Repo", "links": [{"k": "Code", "u": "https://github.com/AUCOHL/RTL-Repo"}, {"k": "Paper", "u": "https://arxiv.org/abs/2405.17378"}], "unverified": false}, "11": {"label": "CVDP", "links": [{"k": "Code", "u": "https://github.com/NVlabs/cvdp_benchmark"}, {"k": "Paper", "u": "https://arxiv.org/abs/2506.14074"}, {"k": "Site", "u": "https://si2.org/summary-and-key-improvements-in-cvdp1-1-0/"}], "unverified": false}, "12": {"label": "ChipBench", "links": [{"k": "Code", "u": "https://github.com/zhongkaiyu/ChipBench"}, {"k": "Paper", "u": "https://arxiv.org/abs/2601.21448"}], "unverified": false}, "13": {"label": "RealBench", "links": [{"k": "Code", "u": "https://github.com/IPRC-DIP/RealBench"}, {"k": "Paper", "u": "https://arxiv.org/abs/2507.16200"}], "unverified": false}, "14": {"label": "VeriGen / Verilog_GitHub", "links": [{"k": "Data", "u": "https://huggingface.co/datasets/shailja/Verilog_GitHub"}, {"k": "Paper", "u": "https://arxiv.org/abs/2212.11140"}], "unverified": false}, "15": {"label": "PyraNet", "links": [{"k": "Data", "u": "https://huggingface.co/datasets/bnadimi/PyraNet-Verilog"}, {"k": "Paper", "u": "https://arxiv.org/abs/2412.06947"}], "unverified": false}, "16": {"label": "MG-Verilog", "links": [{"k": "Code", "u": "https://github.com/GATECH-EIC/mg-verilog"}, {"k": "Paper", "u": "https://arxiv.org/abs/2407.01910"}], "unverified": false}, "17": {"label": "RTLCoder", "links": [{"k": "Code", "u": "https://github.com/hkust-zhiyao/RTL-Coder"}, {"k": "Paper", "u": "https://arxiv.org/abs/2312.08617"}], "unverified": false}, "18": {"label": "OpenRTLSet", "links": [{"k": "Code", "u": "https://github.com/UIUC-ChenLab/OpenRTLSet"}, {"k": "Paper", "u": "https://arxiv.org/abs/2606.10285"}], "unverified": false}, "19": {"label": "VerilogDB", "links": [{"k": "Paper", "u": "https://arxiv.org/abs/2507.13369"}], "unverified": false}, "20": {"label": "FVEval", "links": [{"k": "Code", "u": "https://github.com/NVlabs/FVEval"}, {"k": "Paper", "u": "https://arxiv.org/abs/2410.23299"}], "unverified": false}, "21": {"label": "AssertEval (OpenLLM-RTL)", "links": [{"k": "Paper", "u": "https://arxiv.org/abs/2503.15112"}], "unverified": false}, "22": {"label": "CHStone", "links": [{"k": "Site", "u": "http://www.ertl.jp/chstone/"}, {"k": "Paper", "u": "https://www.jstage.jst.go.jp/article/ipsjjip/17/0/17_0_242/_article"}], "unverified": true}, "23": {"label": "MachSuite", "links": [{"k": "Code", "u": "https://github.com/breagen/MachSuite"}, {"k": "Site", "u": "https://vlsiarch.eecs.harvard.edu/resource/machsuite-benchmarks-accelerator-design-and-customized-architectures-0"}], "unverified": true}, "24": {"label": "PolyBench/C", "links": [{"k": "Site", "u": "https://web.cse.ohio-state.edu/~pouchet.2/software/polybench/"}], "unverified": true}, "25": {"label": "Rosetta", "links": [{"k": "Code", "u": "https://github.com/cornell-zhang/rosetta"}], "unverified": false}, "26": {"label": "HLS-Eval", "links": [{"k": "Code", "u": "https://github.com/stefanpie/hls-eval"}, {"k": "Paper", "u": "https://arxiv.org/abs/2504.12268"}], "unverified": false}, "27": {"label": "HLSFactory", "links": [{"k": "Code", "u": "https://github.com/sharc-lab/HLSFactory"}, {"k": "Paper", "u": "https://arxiv.org/abs/2405.00820"}], "unverified": false}, "28": {"label": "ForgeHLS", "links": [{"k": "Code", "u": "https://github.com/zedong-peng/ForgeHLS"}, {"k": "Paper", "u": "https://arxiv.org/abs/2507.03255"}], "unverified": false}, "29": {"label": "OpenABC-D", "links": [{"k": "Code", "u": "https://github.com/NYU-MLDA/OpenABC"}, {"k": "Data", "u": "https://zenodo.org/records/6399454"}, {"k": "Paper", "u": "https://arxiv.org/abs/2110.11292"}], "unverified": false}, "30": {"label": "ForgeEDA", "links": [{"k": "Paper", "u": "https://arxiv.org/abs/2505.02016"}], "unverified": false}, "31": {"label": "DeepCircuitX", "links": [{"k": "Paper", "u": "https://arxiv.org/abs/2502.18297"}, {"k": "Data", "u": "https://zeju.gitbook.io/lcm-team"}], "unverified": false}, "32": {"label": "MetRex", "links": [{"k": "Code", "u": "https://github.com/scale-lab/MetRex"}, {"k": "Paper", "u": "https://arxiv.org/abs/2411.03471"}], "unverified": false}, "33": {"label": "RTL-OPT", "links": [{"k": "Paper", "u": "https://arxiv.org/abs/2601.01765"}], "unverified": false}, "34": {"label": "CircuitNet", "links": [{"k": "Site", "u": "https://circuitnet.github.io/"}, {"k": "Code", "u": "https://github.com/circuitnet/CircuitNet"}, {"k": "Data", "u": "https://huggingface.co/datasets/CircuitNet/CircuitNet"}, {"k": "Paper", "u": "https://proceedings.iclr.cc/paper_files/paper/2024/hash/464917b6103e074e1f9df7a2bf3bf6ba-Abstract-Conference.html"}], "unverified": false}, "35": {"label": "OpenROAD-flow-scripts", "links": [{"k": "Code", "u": "https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts"}], "unverified": true}, "36": {"label": "AnalogCoder", "links": [{"k": "Code", "u": "https://github.com/laiyao1/AnalogCoder"}, {"k": "Paper", "u": "https://ojs.aaai.org/index.php/AAAI/article/view/32016"}], "unverified": false}, "37": {"label": "AnalogGenie", "links": [{"k": "Code", "u": "https://github.com/xz-group/AnalogGenie"}, {"k": "Paper", "u": "https://arxiv.org/abs/2503.00205"}], "unverified": false}, "38": {"label": "Masala-CHAI", "links": [{"k": "Paper", "u": "https://arxiv.org/abs/2411.14299"}], "unverified": false}, "39": {"label": "AMSbench", "links": [{"k": "Site", "u": "https://amsbench.github.io/"}, {"k": "Data", "u": "https://huggingface.co/datasets/AMSbench/AMSbench"}, {"k": "Paper", "u": "https://arxiv.org/abs/2505.24138"}], "unverified": false}, "40": {"label": "M. Hansen, H. Yalcin, J. Hayes, \"Unveiling the ISCAS-85 Benchmarks: A Case Study in Reverse Engineering,\" IEEE Design & Test (1999). Models", "links": [{"k": "Site", "u": "https://ddd.fit.cvut.cz/www/prj/Benchmarks/ISCAS_Desc/ISCAS_HLM.html"}], "unverified": false}, "41": {"label": "ChipCraftBrain (independent per-benchmark statistics for CVDP, VerilogEval, ChipBench)", "links": [{"k": "Paper", "u": "https://arxiv.org/abs/2604.19856"}], "unverified": false}, "42": {"label": "Si2 LLM Benchmarking Coalition, LBC-bench leaderboard announcement (21 July 2026)", "links": [{"k": "Site", "u": "https://si2.org/?p=1467"}], "unverified": false}}}</script>
+<script>
+(function(){
+const D=JSON.parse(document.getElementById('data').textContent);
+const MEAN={
+ spec:{y:'Expert- or human-authored specification',p:'LLM-generated or incidental documentation',n:'No specification shipped'},
+ hls:{y:'HLS (C/C++) source shipped',p:'Partial HLS source',n:'No HLS source'},
+ rtl:{y:'RTL shipped',p:'Partial, derived or only for some items',n:'No RTL'},
+ gate:{y:'Gate-level netlist shipped',p:'Partial gate-level data',n:'No gate-level netlist'},
+ tb:{y:'Full functional testbench',p:'Self-checking harness, assertions or formal checker',n:'No testbench'},
+ ppa:{y:'Post-place-and-route or post-layout PPA',p:'Post-synthesis or post-HLS estimates only',n:'No PPA labels'},
+ spice:{y:'SPICE netlists shipped',p:'Partial SPICE data',n:'No SPICE netlists'},
+ schem:{y:'Schematics shipped',p:'Partial schematic data',n:'No schematics'},
+ layout:{y:'Layout shipped',p:'Partial layout data',n:'No layout'},
+ simtb:{y:'Simulation testbench shipped',p:'Partial simulation setup',n:'No simulation testbench'},
+ fom:{y:'Figures of merit shipped',p:'Partial or indirect figures of merit',n:'No figures of merit'}
+};
+const COLN={spec:'Spec',hls:'HLS',rtl:'RTL',gate:'Gate',tb:'TB',ppa:'PPA',spice:'SPICE',schem:'Schematic',layout:'Layout',simtb:'Sim TB',fom:'FoM'};
+const STATE={y:'yes',p:'partly',n:'no'};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function dot(k,v){return `<span class="tip" tabindex="0" aria-label="${COLN[k]}: ${STATE[v]}. ${esc(MEAN[k][v])}"><i class="dot ${v}"></i><span class="tt" aria-hidden="true"><b>${COLN[k]}: ${STATE[v]}</b><br>${esc(MEAN[k][v])}</span></span>`}
+function links(refs){
+  let out=[];
+  refs.forEach(n=>{const r=D.refs[n]; if(!r) return;
+    const seen={};r.links.forEach(l=>{seen[l.k]=(seen[l.k]||0)+1;out.push(`<a href="${esc(l.u)}" target="_blank" rel="noopener">${l.k}${seen[l.k]>1?' '+seen[l.k]:''} ↗</a>`)});
+    if(r.unverified) out.push('<span class="unv">† not re-checked</span>');});
+  return out.length?`<div class="links">${out.join('')}</div>`:'';
+}
+function member(m){return `<div class="mem"><div class="mname">${esc(m.name)} <span class="mmeta">[${m.refs.join('], [')}]</span></div>${m.meta?`<div class="mmeta">${esc(m.meta)}</div>`:''}${links(m.refs)}</div>`}
+const DK=['spec','hls','rtl','gate','tb','ppa'], AK=['spec','spice','schem','layout','simtb','fom'];
+const OURS={ours:true,cat:'BRICKS',members:[{name:'BRICKS (proposed target)',meta:'NSF AI Datasets proposal · this work',refs:[]}],
+  r:{spec:'y',hls:'p',rtl:'y',gate:'y',tb:'y',ppa:'y'},size:'—',
+  notes:'Target for every entry: a natural-language specification, synthesizable RTL (with the HLS source where relevant), a gate-level or golden reference model, a verified testbench, and physical-implementation (PPA) annotations, spanning digital, analog and mixed-signal design.'};
+const CATS=[['all','All']].concat([...new Set(D.digital.map(r=>r.cat))].map(c=>[c,c.split('. ')[0]+'. '+shortCat(c)])).concat([['F. Analog / mixed-signal datasets','F. Analog']]);
+function shortCat(c){const t=c.split('. ')[1]; return ({'Legacy logic-synthesis, test, and EDA suites':'Legacy','LLM-era RTL-generation and verification benchmarks (evaluation)':'LLM-era','RTL corpora and training datasets':'Corpora','HLS suites and datasets':'HLS','PPA, synthesis, and physical-design datasets':'PPA & physical'})[t]||t}
+let view='quick',cat='all',q='';
+const catBox=document.getElementById('cats');
+catBox.innerHTML=CATS.map(([k,l],i)=>`<button data-cat="${esc(k)}" aria-pressed="${i==0}" id="cat-${i}">${esc(l)}</button>`).join('');
+function rowText(r){return (r.members.map(m=>m.name+' '+m.meta).join(' ')+' '+r.notes+' '+r.cat).toLowerCase()}
+function render(){
+  const rowsD=D.digital.filter(r=>(cat=='all'||cat==r.cat)&&(!q||rowText(r).includes(q)));
+  const rowsA=D.analog.filter(r=>(cat=='all'||cat==r.cat)&&(!q||rowText(r).includes(q)));
+  const showOurs=(cat=='all')&&(!q||rowText(OURS).includes(q));
+  let html='',last=null;
+  rowsD.forEach(r=>{ if(r.cat!==last){html+=`<tr class="cat"><td colspan="9">${esc(r.cat)}</td></tr>`;last=r.cat}
+    html+=`<tr><td class="name">${r.members.map(member).join('')}</td><td class="size">${esc(r.size)}</td>${DK.map(k=>`<td class="c">${dot(k,r.r[k])}</td>`).join('')}<td class="full-only notes">${esc(r.notes)}</td></tr>`});
+  if(showOurs){html+=`<tr class="cat"><td colspan="9">Proposed</td></tr><tr class="ours"><td class="name">${OURS.members.map(member).join('').replace(' <span class="mmeta">[]</span>','')}</td><td class="size">${OURS.size}</td>${DK.map(k=>`<td class="c">${dot(k,OURS.r[k])}</td>`).join('')}<td class="full-only notes">${esc(OURS.notes)}</td></tr>`}
+  document.querySelector('#dig tbody').innerHTML=html;
+  document.getElementById('dig-block').hidden=!(rowsD.length||showOurs);
+  document.querySelector('#ana tbody').innerHTML=rowsA.map(r=>`<tr><td class="name">${r.members.map(member).join('')}</td><td class="size">${esc(r.size)}</td>${AK.map(k=>`<td class="c">${dot(k,r.r[k])}</td>`).join('')}<td class="full-only notes">${esc(r.notes)}</td></tr>`).join('');
+  document.getElementById('ana-block').hidden=!rowsA.length;
+  const nRes=rowsD.reduce((a,r)=>a+r.members.length,0)+rowsA.length, tot=D.digital.reduce((a,r)=>a+r.members.length,0)+D.analog.length;
+  document.getElementById('count').textContent=`${nRes} of ${tot} resources`+(nRes?'':' · nothing matches this search');
+  document.querySelectorAll('.tbl-wrap').forEach(w=>w.classList.toggle('full',view=='full'));
+}
+document.getElementById('v-quick').onclick=()=>{view='quick';setPressed('v');render()};
+document.getElementById('v-full').onclick=()=>{view='full';setPressed('v');render()};
+function setPressed(){document.getElementById('v-quick').setAttribute('aria-pressed',view=='quick');document.getElementById('v-full').setAttribute('aria-pressed',view=='full')}
+catBox.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;cat=b.dataset.cat;catBox.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()});
+document.getElementById('q').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();render()});
+// coverage cards (per resource; grouped rows count once per member)
+const COV=[['spec','Natural-language specification','yes'],['hls','HLS (C/C++) description','where relevant'],['rtl','RTL','yes'],['gate','Gate-level netlist','yes (or golden model)'],['tb','Verified testbench','yes'],['ppa','PPA annotations','yes, post-layout']];
+const N=D.digital.reduce((a,r)=>a+r.members.length,0);
+document.getElementById('cover').innerHTML=COV.map(([k,label,ours])=>{let y=0,p=0;D.digital.forEach(r=>{const m=r.members.length;if(r.r[k]=='y')y+=m;if(r.r[k]=='p')p+=m});
+  return `<div class="cv"><div class="cv-top"><span class="cv-name">${label}</span><span class="cv-count">${y} yes · ${p} partly · of ${N}</span></div>
+  <div class="bar" role="img" aria-label="${label}: ${y} shipped, ${p} partial, ${N-y-p} not shipped, of ${N}"><i class="y" style="width:${y/N*100}%" title="${y} shipped"></i><i class="p" style="width:${p/N*100}%" title="${p} partial"></i></div>
+  <div class="cv-ours">BRICKS target: <b>${ours}</b></div></div>`}).join('');
+// findings
+const OBS=[{"n": 1, "h": "Natural-language specifications are scarce, small-scale, or of uncertain provenance.", "b": "Only eight resources ([8], [9], [11], [12], [13], [20], [21], [26]) ship expert-authored specifications, and each holds at most a few hundred items. The five that pair such a specification with RTL and a testbench ([8], [9], [11], [12], [13]) together total on the order of one thousand problems."}, {"n": 2, "h": "Legacy suites are structurally rich but semantically empty.", "b": "ISCAS'85/'89, ITC'99, LGSynth/IWLS, and the EPFL suite [1]–[6] are the workhorses of synthesis and test research, yet they provide netlists or RTL with no functional specification. The one prior effort to recover design intent, the manual reverse engineering of ISCAS-85 into high-level models [1], [40], covered only ISCAS-85 and a few smaller ISCAS-89 circuits and took substantial human effort."}, {"n": 3, "h": "Verified testbenches exist almost only where benchmarks are tiny.", "b": "Only six resources ship a self-contained functional testbench ([8], [9], [11], [12], [13], [26]). The corpora with scale ([14]–[19]) have none, apart from compile/synthesis checks and, for a 7K subset of RTLCoder-Data, LLM-generated assertions [17]."}, {"n": 4, "h": "HLS is richer in labels but poorer in language.", "b": "Classic HLS suites ([22]–[25]) contain on the order of ten to thirty kernels each. ForgeHLS and HLSFactory add hundreds of thousands of pragma-varied design points with post-HLS latency and resource labels [27], [28], but no natural-language description."}, {"n": 5, "h": "Physical-implementation annotations are rare and disconnected from specifications.", "b": "Only three resources carry post-place-and-route or post-layout information: ForgeEDA [30], CircuitNet [34], and the OpenROAD flow designs [35]. None of these ships a natural-language specification or testbench."}, {"n": 6, "h": "Scale and realism diverge sharply.", "b": "Where specifications and testbenches exist, designs are small: the CVDP code-generation subset averages roughly 43 lines per design according to an independent analysis [41], ChipBench averages about 62 lines [12], and HLS-Eval' s kernels average 17–70 lines [26]. Million-gate designs appear only in physical-design data (CircuitNet 2.0 [34]) and in the EPFL \"more-than-ten-million-gate\" circuits [6], neither of which has a specification, an integration testbench, or system-level context."}, {"n": 7, "h": "Analog and mixed-signal data lag digital data by a wide margin.", "b": "The analog table shows netlist- and schematic-level collections ([36]–[39]) with a few thousand items at most. AnalogCoder offers 24 simulation-checked tasks [36], AnalogGenie 3,350 topologies without specifications or performance labels [37], Masala-CHAI roughly 7,500 netlists with captions [38], and AMSbench question-answering items [39]."}, {"n": 8, "h": "Licensing and provenance limit reuse.", "b": "Several of the largest corpora are non-commercial or derive from commercial-LLM outputs: PyraNet is CC BY-NC-SA 4.0 [15], and data derived from Resyn-27k is research-only [17]; the OpenRTLSet authors cite such restrictions as motivation for a permissively licensed alternative [18]. Any refinement pipeline must therefore track licence and source provenance per entry."}];
+document.getElementById('gaps').innerHTML=OBS.map(o=>`<li><b>${esc(o.h)}</b> ${esc(o.b)}</li>`).join('');
+document.getElementById('earlier').innerHTML="<li><b>Legacy suites</b> (ISCAS, ITC'99, LGSynth/IWLS, EPFL): the workhorses of synthesis and test research, shipped as netlists or RTL with no functional specification.</li><li><b>LLM-era benchmarks</b> (VerilogEval, RTLLM, CVDP, ChipBench, RealBench, FVEval, AssertEval): expert-written specifications and testbenches; the five that pair a specification with RTL and a testbench total about one thousand problems.</li><li><b>RTL corpora</b> (OpenCores, RTLCoder-Data, RTL-Repo, VeriGen, PyraNet, MG-Verilog, VerilogDB, OpenRTLSet): up to ≈692K items, with machine-generated descriptions and no functional testbench.</li><li><b>HLS suites</b> (CHStone, MachSuite, PolyBench, Rosetta, HLS-Eval, HLSFactory, ForgeHLS): kernels and pragma-varied design points with post-HLS labels; only HLS-Eval pairs them with descriptions.</li><li><b>PPA and physical design</b> (OpenABC-D, ForgeEDA, DeepCircuitX, MetRex, RTL-OPT, CircuitNet, OpenROAD flows): synthesis or layout labels, without a specification or testbench.</li><li><b>Analog and mixed-signal</b> (AnalogCoder, AnalogGenie, Masala-CHAI, AMSbench): netlist- and schematic-level collections of a few thousand items at most.</li>";
+document.getElementById('adds').innerHTML="<li><span class=\"aim\">AIM 1</span><br><b>Specification cleaning, validation and error correction.</b> Cross-reference natural-language specifications against RTL, testbench behavior and simulation results, then flag or repair inconsistencies.</li><li><span class=\"aim\">AIM 2</span><br><b>PPA-aware design variant generation.</b> Take benchmarks through logic synthesis and place-and-route, annotate each design with PPA, and generate Pareto-optimal RTL variants; extend to analog figures of merit.</li><li><span class=\"aim\">AIM 3</span><br><b>Dataset augmentation through design scaling and integration.</b> Scale bit-widths, precision and pipeline depth of existing circuits, and integrate small blocks into SoC-level designs over AMBA/AXI with RISC-V cores.</li><li><span class=\"aim\">AIM 4</span><br><b>Reverse engineering legacy circuits into specifications.</b> Recover natural-language specifications from gate-level and RTL descriptions; for analog designs, convert layout into parameterized Python code first.</li>";
+document.getElementById('caveat').textContent="Ratings reflect what each release or its paper advertises; individual entries within a large corpus can differ. Counts for evolving datasets vary by version (for example, ForgeHLS reports different design and kernel counts across arXiv versions, and the size entries for PolyBench and Rosetta depend on which kernels a given paper includes). Resources marked † were not re-checked during this survey. Survey compiled for the BRICKS proposal to NSF 26-512, October 2026.";
+render();
+})();
+</script>
+
+</body>
+</html>
