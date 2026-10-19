@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Survey of 39 public hardware-design benchmarks rated on the five BRICKS bricks: specification, RTL, golden model, testbench, PPA.">
-<title>BRICKS Benchmark Survey</title>
+<meta name="description" content="39 public benchmarks for AI-driven hardware design, rated on specification, RTL, golden model, testbench and PPA.">
+<title>Hardware Benchmark Matrix</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -109,30 +109,27 @@ footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;font-si
 </style>
 </head>
 <body>
-
-
 <div class="wrap">
 <header>
-  <p class="eyebrow">Literature survey · BRICKS · public hardware-design benchmarks</p>
-  <h1>Which public hardware-design benchmarks have every brick?</h1>
+  <p class="eyebrow">Literature survey · 39 benchmarks and datasets · 1985 – 2026</p>
+  <h1>Benchmarks for AI-driven hardware design</h1>
   <div class="lede">
-    <p>AI-driven hardware design needs training and evaluation items that are <b>aligned tuples</b>, not isolated files. A complete entry has a natural-language specification, a synthesizable RTL implementation (and, where relevant, the HLS source it came from), a gate-level or golden reference model, a verified testbench, and physical-implementation annotations (power, performance, area).</p>
-    <p>We surveyed <b>39 publicly released benchmarks and datasets</b>: logic-synthesis and test suites, LLM-for-RTL benchmarks and corpora, verification benchmarks, HLS suites, PPA and physical-design datasets, and analog/mixed-signal datasets. Each row records which bricks a resource ships and how large it is. Ratings reflect what the released artifacts or the accompanying paper advertise. The proposed BRICKS target is the last row, highlighted.</p>
+    <p>Each public benchmark is rated on the five <b>bricks</b> a complete entry needs. Ratings follow the released files or the paper. BRICKS (proposed) is the last row.</p>
   </div>
   <div class="bricks" aria-label="The five bricks">
     <span class="brick">NL specification</span><span class="brick">RTL (+ HLS source)</span><span class="brick">Golden / gate-level model</span><span class="brick">Verified testbench</span><span class="brick">PPA annotations</span>
   </div>
   <div class="legend" aria-label="Legend">
-    <span><i class="dot y"></i>Shipped and usable</span>
-    <span><i class="dot p"></i>Partial, indirect, machine-generated or lower-fidelity</span>
-    <span><i class="dot n"></i>Not shipped</span>
+    <span><i class="dot y"></i>Yes</span>
+    <span><i class="dot p"></i>Partly</span>
+    <span><i class="dot n"></i>No</span>
   </div>
 </header>
 
 <section aria-labelledby="cov-h">
   <h2 id="cov-h">What the 35 digital and HLS resources cover</h2>
   <div class="cover" id="cover"></div>
-  <p class="note">Counted per resource, so grouped rows in the table count once per member. The four analog and mixed-signal datasets use different columns and are listed in their own table.</p>
+  <p class="note">Counted per resource; grouped rows count once per member.</p>
 </section>
 
 <section aria-labelledby="tbl-h">
@@ -157,7 +154,7 @@ footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;font-si
   </div>
 
   <div id="ana-block">
-    <div class="subhead"><h3>Analog and mixed-signal datasets</h3><span class="count" style="margin:0">different bricks apply: SPICE, schematic, layout, simulation testbench, figures of merit</span></div>
+    <div class="subhead"><h3>Analog and mixed-signal datasets</h3></div>
     <div class="tbl-wrap"><table id="ana">
       <thead><tr>
         <th>Dataset<small>year · origin · links</small></th><th>Size</th>
@@ -166,7 +163,7 @@ footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;font-si
       </tr></thead><tbody></tbody>
     </table></div>
   </div>
-  <p class="note">In the quick view, hover over or focus a dot to see what it means, or switch to full details for the notes on each row. Links marked † were not re-checked during this survey.</p>
+  <p class="note">Hover a dot for its meaning. † link not re-checked.</p>
 </section>
 
 <section aria-labelledby="find-h">
@@ -181,13 +178,13 @@ footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;font-si
 <section aria-labelledby="read-h">
   <h2 id="read-h">How to read the table</h2>
   <dl class="read">
-    <dt>Spec</dt><dd>Natural-language specification. Shipped means human- or expert-authored. Partial means LLM-generated or incidental documentation.</dd>
-    <dt>HLS</dt><dd>HLS (C/C++) description.</dd>
+    <dt>Spec</dt><dd>Natural-language specification. Partly: LLM-generated or incidental.</dd>
+    <dt>HLS</dt><dd>HLS (C/C++) source.</dd>
     <dt>RTL</dt><dd>RTL in Verilog, VHDL or SystemVerilog.</dd>
     <dt>Gate</dt><dd>Gate-level netlist.</dd>
-    <dt>TB</dt><dd>Testbench. Partial means a self-checking harness, assertions or a formal checker rather than a full reference testbench.</dd>
-    <dt>PPA</dt><dd>Power, performance and area annotations. Shipped means post-place-and-route or post-layout. Partial means post-synthesis or post-HLS estimates only.</dd>
-    <dt>Size</dt><dd><b>+</b> up to roughly 200 items, or mostly small blocks. <b>++</b> hundreds to tens of thousands of items, or designs up to roughly 100K gates. <b>+++</b> more than 100K items, or million-gate designs. Grouped rows share identical ratings on all six bricks, so the size column shows the range.</dd>
+    <dt>TB</dt><dd>Testbench. Partly: harness, assertions or formal checker only.</dd>
+    <dt>PPA</dt><dd>Power, performance, area. Yes: post-layout. Partly: post-synthesis or post-HLS.</dd>
+    <dt>Size</dt><dd><b>+</b> ≤ ~200 items &nbsp; <b>++</b> hundreds to tens of thousands, or ≤ ~100K gates &nbsp; <b>+++</b> &gt; 100K items, or million-gate designs</dd>
   </dl>
 </section>
 
@@ -226,9 +223,9 @@ function links(refs){
 }
 function member(m){return `<div class="mem"><div class="mname">${esc(m.name)} <span class="mmeta">[${m.refs.join('], [')}]</span></div>${m.meta?`<div class="mmeta">${esc(m.meta)}</div>`:''}${links(m.refs)}</div>`}
 const DK=['spec','hls','rtl','gate','tb','ppa'], AK=['spec','spice','schem','layout','simtb','fom'];
-const OURS={ours:true,cat:'BRICKS',members:[{name:'BRICKS (proposed target)',meta:'NSF AI Datasets proposal · this work',refs:[]}],
+const OURS={ours:true,cat:'BRICKS',members:[{name:'BRICKS (proposed target)',meta:'Proposed dataset · this work',refs:[]}],
   r:{spec:'y',hls:'p',rtl:'y',gate:'y',tb:'y',ppa:'y'},size:'—',
-  notes:'Target for every entry: a natural-language specification, synthesizable RTL (with the HLS source where relevant), a gate-level or golden reference model, a verified testbench, and physical-implementation (PPA) annotations, spanning digital, analog and mixed-signal design.'};
+  notes:'Target: all five bricks per entry, for digital, analog and mixed-signal designs.'};
 const CATS=[['all','All']].concat([...new Set(D.digital.map(r=>r.cat))].map(c=>[c,c.split('. ')[0]+'. '+shortCat(c)])).concat([['F. Analog / mixed-signal datasets','F. Analog']]);
 function shortCat(c){const t=c.split('. ')[1]; return ({'Legacy logic-synthesis, test, and EDA suites':'Legacy','LLM-era RTL-generation and verification benchmarks (evaluation)':'LLM-era','RTL corpora and training datasets':'Corpora','HLS suites and datasets':'HLS','PPA, synthesis, and physical-design datasets':'PPA & physical'})[t]||t}
 let view='quick',cat='all',q='';
@@ -264,14 +261,13 @@ document.getElementById('cover').innerHTML=COV.map(([k,label,ours])=>{let y=0,p=
   <div class="bar" role="img" aria-label="${label}: ${y} shipped, ${p} partial, ${N-y-p} not shipped, of ${N}"><i class="y" style="width:${y/N*100}%" title="${y} shipped"></i><i class="p" style="width:${p/N*100}%" title="${p} partial"></i></div>
   <div class="cv-ours">BRICKS target: <b>${ours}</b></div></div>`}).join('');
 // findings
-const OBS=[{"n": 1, "h": "Natural-language specifications are scarce, small-scale, or of uncertain provenance.", "b": "Only eight resources ([8], [9], [11], [12], [13], [20], [21], [26]) ship expert-authored specifications, and each holds at most a few hundred items. The five that pair such a specification with RTL and a testbench ([8], [9], [11], [12], [13]) together total on the order of one thousand problems."}, {"n": 2, "h": "Legacy suites are structurally rich but semantically empty.", "b": "ISCAS'85/'89, ITC'99, LGSynth/IWLS, and the EPFL suite [1]–[6] are the workhorses of synthesis and test research, yet they provide netlists or RTL with no functional specification. The one prior effort to recover design intent, the manual reverse engineering of ISCAS-85 into high-level models [1], [40], covered only ISCAS-85 and a few smaller ISCAS-89 circuits and took substantial human effort."}, {"n": 3, "h": "Verified testbenches exist almost only where benchmarks are tiny.", "b": "Only six resources ship a self-contained functional testbench ([8], [9], [11], [12], [13], [26]). The corpora with scale ([14]–[19]) have none, apart from compile/synthesis checks and, for a 7K subset of RTLCoder-Data, LLM-generated assertions [17]."}, {"n": 4, "h": "HLS is richer in labels but poorer in language.", "b": "Classic HLS suites ([22]–[25]) contain on the order of ten to thirty kernels each. ForgeHLS and HLSFactory add hundreds of thousands of pragma-varied design points with post-HLS latency and resource labels [27], [28], but no natural-language description."}, {"n": 5, "h": "Physical-implementation annotations are rare and disconnected from specifications.", "b": "Only three resources carry post-place-and-route or post-layout information: ForgeEDA [30], CircuitNet [34], and the OpenROAD flow designs [35]. None of these ships a natural-language specification or testbench."}, {"n": 6, "h": "Scale and realism diverge sharply.", "b": "Where specifications and testbenches exist, designs are small: the CVDP code-generation subset averages roughly 43 lines per design according to an independent analysis [41], ChipBench averages about 62 lines [12], and HLS-Eval' s kernels average 17–70 lines [26]. Million-gate designs appear only in physical-design data (CircuitNet 2.0 [34]) and in the EPFL \"more-than-ten-million-gate\" circuits [6], neither of which has a specification, an integration testbench, or system-level context."}, {"n": 7, "h": "Analog and mixed-signal data lag digital data by a wide margin.", "b": "The analog table shows netlist- and schematic-level collections ([36]–[39]) with a few thousand items at most. AnalogCoder offers 24 simulation-checked tasks [36], AnalogGenie 3,350 topologies without specifications or performance labels [37], Masala-CHAI roughly 7,500 netlists with captions [38], and AMSbench question-answering items [39]."}, {"n": 8, "h": "Licensing and provenance limit reuse.", "b": "Several of the largest corpora are non-commercial or derive from commercial-LLM outputs: PyraNet is CC BY-NC-SA 4.0 [15], and data derived from Resyn-27k is research-only [17]; the OpenRTLSet authors cite such restrictions as motivation for a permissively licensed alternative [18]. Any refinement pipeline must therefore track licence and source provenance per entry."}];
+const OBS=[{"n": 1, "h": "Specifications are scarce.", "b": "8 resources ship expert-written specs, each with a few hundred items at most."}, {"n": 2, "h": "Testbenches only come with tiny benchmarks.", "b": "6 resources ship one; the large corpora have none."}, {"n": 3, "h": "PPA rarely meets specifications.", "b": "3 resources have post-layout data, none with a spec."}, {"n": 4, "h": "Designs are small.", "b": "Spec-and-testbench benchmarks average about 43 to 62 lines per design."}, {"n": 5, "h": "Analog lags digital.", "b": "A few thousand items at most."}, {"n": 6, "h": "Licensing limits reuse.", "b": "Several large corpora are non-commercial or derived from commercial LLM outputs."}];
 document.getElementById('gaps').innerHTML=OBS.map(o=>`<li><b>${esc(o.h)}</b> ${esc(o.b)}</li>`).join('');
-document.getElementById('earlier').innerHTML="<li><b>Legacy suites</b> (ISCAS, ITC'99, LGSynth/IWLS, EPFL): the workhorses of synthesis and test research, shipped as netlists or RTL with no functional specification.</li><li><b>LLM-era benchmarks</b> (VerilogEval, RTLLM, CVDP, ChipBench, RealBench, FVEval, AssertEval): expert-written specifications and testbenches; the five that pair a specification with RTL and a testbench total about one thousand problems.</li><li><b>RTL corpora</b> (OpenCores, RTLCoder-Data, RTL-Repo, VeriGen, PyraNet, MG-Verilog, VerilogDB, OpenRTLSet): up to ≈692K items, with machine-generated descriptions and no functional testbench.</li><li><b>HLS suites</b> (CHStone, MachSuite, PolyBench, Rosetta, HLS-Eval, HLSFactory, ForgeHLS): kernels and pragma-varied design points with post-HLS labels; only HLS-Eval pairs them with descriptions.</li><li><b>PPA and physical design</b> (OpenABC-D, ForgeEDA, DeepCircuitX, MetRex, RTL-OPT, CircuitNet, OpenROAD flows): synthesis or layout labels, without a specification or testbench.</li><li><b>Analog and mixed-signal</b> (AnalogCoder, AnalogGenie, Masala-CHAI, AMSbench): netlist- and schematic-level collections of a few thousand items at most.</li>";
-document.getElementById('adds').innerHTML="<li><span class=\"aim\">AIM 1</span><br><b>Specification cleaning, validation and error correction.</b> Cross-reference natural-language specifications against RTL, testbench behavior and simulation results, then flag or repair inconsistencies.</li><li><span class=\"aim\">AIM 2</span><br><b>PPA-aware design variant generation.</b> Take benchmarks through logic synthesis and place-and-route, annotate each design with PPA, and generate Pareto-optimal RTL variants; extend to analog figures of merit.</li><li><span class=\"aim\">AIM 3</span><br><b>Dataset augmentation through design scaling and integration.</b> Scale bit-widths, precision and pipeline depth of existing circuits, and integrate small blocks into SoC-level designs over AMBA/AXI with RISC-V cores.</li><li><span class=\"aim\">AIM 4</span><br><b>Reverse engineering legacy circuits into specifications.</b> Recover natural-language specifications from gate-level and RTL descriptions; for analog designs, convert layout into parameterized Python code first.</li>";
-document.getElementById('caveat').textContent="Ratings reflect what each release or its paper advertises; individual entries within a large corpus can differ. Counts for evolving datasets vary by version (for example, ForgeHLS reports different design and kernel counts across arXiv versions, and the size entries for PolyBench and Rosetta depend on which kernels a given paper includes). Resources marked † were not re-checked during this survey. Survey compiled for the BRICKS proposal to NSF 26-512, October 2026.";
+document.getElementById('earlier').innerHTML="<li><b>Legacy suites:</b> netlists or RTL, no specification.</li><li><b>LLM-era benchmarks:</b> expert specs and testbenches, ~1K problems in total.</li><li><b>RTL corpora:</b> up to ≈692K items, LLM-written descriptions, no testbench.</li><li><b>HLS suites:</b> post-HLS labels, almost no natural language.</li><li><b>PPA and physical design:</b> synthesis or layout labels, no specification.</li><li><b>Analog and mixed-signal:</b> a few thousand items at most.</li>";
+document.getElementById('adds').innerHTML="<li><span class=\"aim\">AIM 1</span><br><b>Clean, validate and repair specifications.</b></li><li><span class=\"aim\">AIM 2</span><br><b>Generate PPA-annotated design variants.</b></li><li><span class=\"aim\">AIM 3</span><br><b>Scale designs and integrate them into SoCs.</b></li><li><span class=\"aim\">AIM 4</span><br><b>Reverse engineer legacy circuits into specifications.</b></li>";
+document.getElementById('caveat').textContent="Ratings reflect what each release or paper advertises; counts for evolving datasets vary by version. Compiled October 2026.";
 render();
 })();
 </script>
-
 </body>
 </html>
